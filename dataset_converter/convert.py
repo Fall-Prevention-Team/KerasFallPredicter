@@ -50,9 +50,9 @@ def main():
 
     converted_data.extend(convert_dataset(d4, 200, 0.5, 15, data_class=2, from_second=9))
     converted_data.extend(convert_dataset(d5, 200, 0.5, 15, data_class=2, from_second=9))
-    converted_data.extend(convert_dataset(d5, 200, 0.5, 15, data_class=2, from_second=9))
-    converted_data.extend(convert_dataset(d5, 200, 0.5, 15, data_class=2, from_second=9))
-    converted_data.extend(convert_dataset(d5, 200, 0.5, 15, data_class=2, from_second=9))
+    converted_data.extend(convert_dataset(d6, 200, 0.5, 15, data_class=2, from_second=9))
+    converted_data.extend(convert_dataset(d7, 200, 0.5, 15, data_class=2, from_second=9))
+    converted_data.extend(convert_dataset(d8, 200, 0.5, 15, data_class=2, from_second=9))
 
     train_set = []
     test_set = []
