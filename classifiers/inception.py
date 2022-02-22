@@ -109,7 +109,7 @@ class Classifier_INCEPTION:
 
         return model
 
-    def fit(self, x_train, y_train, x_val, y_val, y_true, plot_test_acc=False):
+    def fit(self, x_train, y_train, x_val, y_val, y_true, plot_test_acc=True):
         # if len(keras.backend.tensorflow_backend._get_available_gpus()) == 0:
             #print('error no gpu')
             #exit()
@@ -140,7 +140,7 @@ class Classifier_INCEPTION:
 
         # save predictions
         np.save(self.output_directory + 'y_pred.npy', y_pred)
-
+        
         # convert the predicted from binary to integer
         y_pred = np.argmax(y_pred, axis=1)
 

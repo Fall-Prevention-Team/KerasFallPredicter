@@ -2,6 +2,7 @@ import sys, json
 import numpy as np
 import keras
 
+""" !! DUMP MODEL IN SAME FOLDER AS THE SCRIPT IS RUN FROM !! """
 MODEL_PATH = './best_model.hdf5'
 TARGET_LENGTH = 6
 
