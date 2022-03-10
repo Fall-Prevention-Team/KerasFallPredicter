@@ -74,9 +74,9 @@ def predict_cli():
             predictable_arr = array_to_prediction_obj(cli_str)
             prediction = model.predict(predictable_arr)
             response_dict = {
-                    'class1': json.dumps(prediction[0, 1].item()),
-                    'class2': json.dumps(prediction[0, 0].item())
-                    }
+                'NoFall': json.dumps(round(prediction[0, 0].item(), 6)),
+                'Fall': json.dumps(round(prediction[0, 1].item(), 6))
+            }
             print(json.dumps(response_dict))
         except Exception as e:
             print(e)
