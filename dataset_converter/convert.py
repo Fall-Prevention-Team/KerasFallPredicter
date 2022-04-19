@@ -3,11 +3,13 @@ import argparse
 import pandas as pd
 
 def load_dataset(filepath):
-    with open(filepath, 'r', encoding='utf8') as f:
-        data = pd.read_csv(f, sep=',', header=None)
-        data = data.replace(r';', '', regex=True)
-    return data
-
+    if os.path.exists(filepath):
+        with open(filepath, 'r', encoding='utf8') as f:
+            data = pd.read_csv(f, sep=',', header=None)
+            data = data.replace(r';', '', regex=True)
+        return data
+    else:
+        return pd.DataFrame()
 
 def save_tsv(obj, filepath):
     with open(filepath, 'wt') as out_file:
@@ -16,7 +18,7 @@ def save_tsv(obj, filepath):
             tsv_writer.writerow(row)
 
 
-def convert_dataset(data, dataset_hz, samples_every_x_second, length_in_seconds, length=60, data_class=1, from_second=0):
+def convert_dataset(data, dataset_hz, samples_every_x_second, length_in_seconds, length=15, data_class=1, from_second=0):
     sample_set = []
 
     take_sample_every_x_hz = samples_every_x_second * dataset_hz
@@ -27,7 +29,7 @@ def convert_dataset(data, dataset_hz, samples_every_x_second, length_in_seconds,
             continue
         if not (num % take_sample_every_x_hz) == 1:
             continue
-        sample_set.extend([i[0], i[1], i[2], i[3], i[4], i[5]])
+        sample_set.extend([i[0], i[1], i[2]]) #, i[3], i[4], i[5]])
         if len(sample_set) >= length:
             converted_dataset.append([data_class] + sample_set)
             print('sample set added to dataset with length;',len(sample_set), '+ class.')
@@ -88,7 +90,7 @@ def main():
     print('dataset saved')
 
 
-def sisfall_main(hz=200, take_sample_every_x_second=0.5):
+def sisfall_main(hz=200, take_sample_every_x_second=1):
     converted_data = []
     with open('out.txt', 'r') as fpp:
         path_list = fpp.read()
@@ -104,13 +106,15 @@ def sisfall_main(hz=200, take_sample_every_x_second=0.5):
         trail_num = int(trail_tag[1] + trail_tag[2])
         
         ds_fp = load_dataset(path)
+        if ds_fp.empty:
+            continue
 
         if no_fall and trail_num <= 4:
             converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 100))
         elif no_fall:
             converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 25))
         elif not no_fall:
-            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 15, data_class=2, from_second=9))
+            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 15, data_class=2))
         else:
             raise Exception('bro how the fuck')
         
@@ -118,9 +122,9 @@ def sisfall_main(hz=200, take_sample_every_x_second=0.5):
         
 
     for dp in converted_data:
-        if len(dp) != 61:
+        if len(dp) != 16:
             print(len(dp), dp)
-            assert len(dp) == 61, 'Wrong datapoint length.'
+            assert len(dp) == 16, 'Wrong datapoint length.'
 
     train_set = []
     test_set = []
@@ -129,10 +133,11 @@ def sisfall_main(hz=200, take_sample_every_x_second=0.5):
             test_set.append(dp)
         else:
             train_set.append(dp)
-    save_tsv(train_set, './out_TRAIN.tsv')
-    save_tsv(test_set, './out_TEST.tsv')
+    fname = 'out1hz'
+    #save_tsv(train_set, f'./{fname}_TRAIN.tsv')
+    #save_tsv(test_set, f'./{fname}_TEST.tsv')
 
-    #save_tsv(converted_data, './out.tsv')
+    save_tsv(converted_data, f'./{fname}.tsv')
     print('dataset saved')
 
 
