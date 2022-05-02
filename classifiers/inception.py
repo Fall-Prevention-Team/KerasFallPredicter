@@ -12,7 +12,7 @@ print('keras --version', keras.__version__)
 class Classifier_INCEPTION:
 
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64,
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=600): # epochs should be 1500
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=100): # epochs should be 1500
 
         self.output_directory = output_directory
 
@@ -95,7 +95,7 @@ class Classifier_INCEPTION:
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
         model.compile(loss='categorical_crossentropy', optimizer='adam',
-                      metrics=['accuracy'])
+                      metrics=['accuracy', 'recall'])
 
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
