@@ -1,9 +1,6 @@
 # Custom ignores
 .archives
-/archives
-/archives/
-archives/
-archives
+archives/SisFall_dataset
 
 venv/
 # Byte-compiled / optimized / DLL files
