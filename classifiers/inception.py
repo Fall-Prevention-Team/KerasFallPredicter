@@ -10,9 +10,9 @@ from utils.utils import save_test_duration
 print('keras --version', keras.__version__)
 
 class Classifier_INCEPTION:
-
-    def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64,
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=1500): # epochs should be 1500
+ 
+    def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64, # kernel_size OG = 41, trial 49, 
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=66, nb_epochs=1500): # epochs should be 1500
 
         self.output_directory = output_directory
 
@@ -22,7 +22,7 @@ class Classifier_INCEPTION:
         self.depth = depth
         self.kernel_size = kernel_size - 1
         self.callbacks = None
-        self.batch_size = None # batch_size
+        self.batch_size = batch_size
         self.bottleneck_size = 32
         self.nb_epochs = nb_epochs
 
@@ -42,7 +42,9 @@ class Classifier_INCEPTION:
             input_inception = input_tensor
 
         # kernel_size_s = [3, 5, 8, 11, 17]
-        kernel_size_s = [self.kernel_size // (2 ** i) for i in range(3)]
+        # kernel_size_s = [3, 5, 8, 11, 17]
+        # range orginal = 3
+        kernel_size_s = [self.kernel_size // (2 ** i) for i in range(7)]
 
         conv_list = []
 
@@ -71,7 +73,7 @@ class Classifier_INCEPTION:
 
 
         x = keras.layers.Add()([shortcut_y, out_tensor])
-        x = keras.layers.Activation('relu')(x)
+        x = keras.layers.Activation('relu')(x) 
         return x
 
     def build_model(self, input_shape, nb_classes):
@@ -90,13 +92,14 @@ class Classifier_INCEPTION:
 
         gap_layer = keras.layers.GlobalAveragePooling1D()(x)
 
-        output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer)
+        output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer) # 
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
         model.compile(loss='categorical_crossentropy', optimizer='adam',
                       metrics=['accuracy'])
 
+        # monitor='loss'
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
 
