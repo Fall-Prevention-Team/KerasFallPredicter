@@ -10,9 +10,10 @@ from utils.utils import save_test_duration
 print('keras --version', keras.__version__)
 
 class Classifier_INCEPTION:
- 
+    
+    # depth = 6, nb_filters=32
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64, # kernel_size OG = 41, trial 49, 
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=66, nb_epochs=1500): # epochs should be 1500
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=49, nb_epochs=1500): # epochs should be 1500
 
         self.output_directory = output_directory
 
@@ -33,7 +34,8 @@ class Classifier_INCEPTION:
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
 
-    def _inception_module(self, input_tensor, stride=1, activation='linear'):
+    # activation='linear'
+    def _inception_module(self, input_tensor, stride=1, activation='linear'): 
 
         if self.use_bottleneck and int(input_tensor.shape[-1]) > 1:
             input_inception = keras.layers.Conv1D(filters=self.bottleneck_size, kernel_size=1,
@@ -44,7 +46,7 @@ class Classifier_INCEPTION:
         # kernel_size_s = [3, 5, 8, 11, 17]
         # kernel_size_s = [3, 5, 8, 11, 17]
         # range orginal = 3
-        kernel_size_s = [self.kernel_size // (2 ** i) for i in range(7)]
+        kernel_size_s = [self.kernel_size // (2 ** i) for i in range(6)]
 
         conv_list = []
 
@@ -100,12 +102,13 @@ class Classifier_INCEPTION:
                       metrics=['accuracy'])
 
         # monitor='loss'
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=50,
+        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
 
         file_path = self.output_directory + 'best_model.hdf5'
-
-        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
+        
+        # monitor='loss'
+        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
         self.callbacks = [reduce_lr, model_checkpoint]
