@@ -25,11 +25,10 @@ def convert_dataset(data, dataset_hz, samples_every_x_second, length_in_seconds,
     converted_dataset = []
 
     for num, i in enumerate(data.to_dict(orient='records')):
-        if not (num/dataset_hz) > from_second:
-            continue
-        if not (num % take_sample_every_x_hz) == 1:
+        if not (num % take_sample_every_x_hz) == 0:
             continue
         sample_set.extend([i[0], i[1], i[2]]) #, i[3], i[4], i[5]])
+        print('current len:', len(sample_set))
         if len(sample_set) >= length:
             converted_dataset.append([data_class] + sample_set)
             print('sample set added to dataset with length;',len(sample_set), '+ class.')
@@ -90,9 +89,9 @@ def main():
     print('dataset saved')
 
 
-def sisfall_main(hz=200, take_sample_every_x_second=1):
+def sisfall_main(target_length=45, hz=200, take_sample_every_x_second=1):
     converted_data = []
-    with open('out.txt', 'r') as fpp:
+    with open('sisfall_paths.txt', 'r') as fpp:
         path_list = fpp.read()
         path_list = path_list.split('\n')
     
@@ -108,23 +107,23 @@ def sisfall_main(hz=200, take_sample_every_x_second=1):
         ds_fp = load_dataset(path)
         if ds_fp.empty:
             continue
-
+        print('NEW DATASET! no fall?:', no_fall)
         if no_fall and trail_num <= 4:
-            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 100))
+            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 100, target_length))
         elif no_fall:
-            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 25))
+            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 25, target_length))
         elif not no_fall:
-            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 15, data_class=2))
+            converted_data.extend(convert_dataset(ds_fp, hz, take_sample_every_x_second, 15, target_length, data_class=2))
         else:
             raise Exception('bro how the fuck')
         
-        print(len(converted_data))
+        print('\nset length:',len(converted_data))
         
 
     for dp in converted_data:
-        if len(dp) != 16:
+        if len(dp) != target_length+1:
             print(len(dp), dp)
-            assert len(dp) == 16, 'Wrong datapoint length.'
+            assert len(dp) == target_length+1, 'Wrong datapoint length.'
 
     train_set = []
     test_set = []
@@ -133,11 +132,11 @@ def sisfall_main(hz=200, take_sample_every_x_second=1):
             test_set.append(dp)
         else:
             train_set.append(dp)
-    fname = 'out1hz'
-    #save_tsv(train_set, f'./{fname}_TRAIN.tsv')
-    #save_tsv(test_set, f'./{fname}_TEST.tsv')
+    fname = f'sisfall_{str(1/take_sample_every_x_second)}hz'
+    save_tsv(train_set, f'./{fname}_TRAIN.tsv')
+    save_tsv(test_set, f'./{fname}_TEST.tsv')
 
-    save_tsv(converted_data, f'./{fname}.tsv')
+    #save_tsv(converted_data, f'./{fname}.tsv')
     print('dataset saved')
 
 

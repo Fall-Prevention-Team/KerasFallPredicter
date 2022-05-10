@@ -13,7 +13,7 @@ class Classifier_INCEPTION:
     
     # depth = 6, nb_filters=32
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64, # kernel_size OG = 41, trial 49, 
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=81, nb_epochs=1500): # epochs should be 1500
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=49, nb_epochs=1500): # epochs should be 1500
 
         self.output_directory = output_directory
 
@@ -34,9 +34,7 @@ class Classifier_INCEPTION:
             self.verbose = verbose
             self.model.save_weights(self.output_directory + 'model_init.hdf5')
 
-    # activation='linear'
     def _inception_module(self, input_tensor, stride=1, activation='linear'): 
-        # use_bias=False
         if self.use_bottleneck and int(input_tensor.shape[-1]) > 1:
             input_inception = keras.layers.Conv1D(filters=self.bottleneck_size, kernel_size=1,
                                                   padding='same', activation=activation, use_bias=False)(input_tensor)
@@ -44,13 +42,11 @@ class Classifier_INCEPTION:
             input_inception = input_tensor
 
         # kernel_size_s = [3, 5, 8, 11, 17]
-        # kernel_size_s = [3, 5, 8, 11, 17]
         # range orginal = 3
         kernel_size_s = [self.kernel_size // (2 ** i) for i in range(6)]
 
         conv_list = []
         
-        # use_bias=False
         for i in range(len(kernel_size_s)):
             conv_list.append(keras.layers.Conv1D(filters=self.nb_filters, kernel_size=kernel_size_s[i],
                                                  strides=stride, padding='same', activation=activation, use_bias=False)(
@@ -72,7 +68,6 @@ class Classifier_INCEPTION:
     def _shortcut_layer(self, input_tensor, out_tensor):
         shortcut_y = keras.layers.Conv1D(filters=int(out_tensor.shape[-1]), kernel_size=1,
                                          padding='same', use_bias=False)(input_tensor)
-        # shortcut_y = keras.layers.normalization.BatchNormalization()(shortcut_y)
         shortcut_y = keras.layers.BatchNormalization()(shortcut_y)
 
 
@@ -97,12 +92,10 @@ class Classifier_INCEPTION:
 
         gap_layer = keras.layers.GlobalAveragePooling1D()(x)
 
-        # activation='softmax'
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer) # 
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
-        # loss='categorical_crossentropy'
         model.compile(loss='categorical_crossentropy', optimizer='adam',
                       metrics=['accuracy'])
 
@@ -121,11 +114,6 @@ class Classifier_INCEPTION:
         return model
 
     def fit(self, x_train, y_train, x_val, y_val, y_true, plot_test_acc=True):
-        # if len(keras.backend.tensorflow_backend._get_available_gpus()) == 0:
-            #print('error no gpu')
-            #exit()
-        # x_val and y_val are only used to monitor the test loss and NOT for training
-
         if self.batch_size is None:
             mini_batch_size = int(min(x_train.shape[0] / 10, 16))
         else:
