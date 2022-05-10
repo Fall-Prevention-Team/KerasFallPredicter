@@ -1,0 +1,7 @@
+precision,accuracy,recall,duration
+0.9473417721518987,0.9534883720930233,0.9544753086419753,187.77781128883362
+
+Inception modules
+- leaky relu activation of concat layer 
+- scaled kernal size (49)
+- inception modules layers = 6

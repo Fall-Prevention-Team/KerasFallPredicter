@@ -13,7 +13,7 @@ class Classifier_INCEPTION:
     
     # depth = 6, nb_filters=32
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64, # kernel_size OG = 41, trial 49, 
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=49, nb_epochs=1500): # epochs should be 1500
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=81, nb_epochs=1500): # epochs should be 1500
 
         self.output_directory = output_directory
 
@@ -36,7 +36,7 @@ class Classifier_INCEPTION:
 
     # activation='linear'
     def _inception_module(self, input_tensor, stride=1, activation='linear'): 
-
+        # use_bias=False
         if self.use_bottleneck and int(input_tensor.shape[-1]) > 1:
             input_inception = keras.layers.Conv1D(filters=self.bottleneck_size, kernel_size=1,
                                                   padding='same', activation=activation, use_bias=False)(input_tensor)
@@ -49,7 +49,8 @@ class Classifier_INCEPTION:
         kernel_size_s = [self.kernel_size // (2 ** i) for i in range(6)]
 
         conv_list = []
-
+        
+        # use_bias=False
         for i in range(len(kernel_size_s)):
             conv_list.append(keras.layers.Conv1D(filters=self.nb_filters, kernel_size=kernel_size_s[i],
                                                  strides=stride, padding='same', activation=activation, use_bias=False)(
@@ -64,7 +65,8 @@ class Classifier_INCEPTION:
 
         x = keras.layers.Concatenate(axis=2)(conv_list)
         x = keras.layers.BatchNormalization()(x)
-        x = keras.layers.Activation(activation='relu')(x)
+        #activation='relu'
+        x = keras.layers.Activation(activation='leaky_relu')(x)
         return x
 
     def _shortcut_layer(self, input_tensor, out_tensor):
@@ -75,7 +77,8 @@ class Classifier_INCEPTION:
 
 
         x = keras.layers.Add()([shortcut_y, out_tensor])
-        x = keras.layers.Activation('relu')(x) 
+        #activation='relu'
+        x = keras.layers.Activation('leaky_relu')(x) 
         return x
 
     def build_model(self, input_shape, nb_classes):
@@ -94,10 +97,12 @@ class Classifier_INCEPTION:
 
         gap_layer = keras.layers.GlobalAveragePooling1D()(x)
 
+        # activation='softmax'
         output_layer = keras.layers.Dense(nb_classes, activation='softmax')(gap_layer) # 
 
         model = keras.models.Model(inputs=input_layer, outputs=output_layer)
 
+        # loss='categorical_crossentropy'
         model.compile(loss='categorical_crossentropy', optimizer='adam',
                       metrics=['accuracy'])
 

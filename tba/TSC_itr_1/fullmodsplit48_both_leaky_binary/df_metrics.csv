@@ -1,0 +1,11 @@
+precision,accuracy,recall,duration
+0.9502314814814814,0.9534883720930233,0.9502314814814814,190.49012064933777
+
+
+Inception modules
+- leaky relu activation of concat layer 
+- leaky relu activation of shortcut layer layer 
+- scaled kernal size (49)
+- inception modules layers = 6
+
+- loss = binary_crossentropy

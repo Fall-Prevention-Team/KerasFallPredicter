@@ -17,7 +17,7 @@
                             'uWaveGestureLibrary_Z', 'wafer', 'Wine', 'WordsSynonyms', 'Worms', 'WormsTwoClass', 'yoga']
 """
 # UNIVARIATE_DATASET_NAMES = ['Meat', 'Coffee']
-UNIVARIATE_DATASET_NAMES = ['fullmodsplit48']
+UNIVARIATE_DATASET_NAMES = ['ProximalPhalanxOutlineAgeGroup']
 
 UNIVARIATE_ARCHIVE_NAMES = ['TSC']
 # UNIVARIATE_ARCHIVE_NAMES = ['TSC', 'InlineSkateXPs', 'SITS']
