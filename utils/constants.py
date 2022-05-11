@@ -17,7 +17,8 @@
                             'uWaveGestureLibrary_Z', 'wafer', 'Wine', 'WordsSynonyms', 'Worms', 'WormsTwoClass', 'yoga']
 """
 # UNIVARIATE_DATASET_NAMES = ['Meat', 'Coffee']
-UNIVARIATE_DATASET_NAMES = ['sisfall_1.0hz','sisfall_2.0hz','sisfall_4.0hz','sisfall_8.0hz','sisfall_20.0hz','sisfall_100.0hz']
+UNIVARIATE_DATASET_NAMES = ['fullmodsplit48', 'fulldatasetplus48','sisfall_1.0hz','sisfall_2.0hz','sisfall_4.0hz','sisfall_8.0hz','sisfall_20.0hz']
+#UNIVARIATE_DATASET_NAMES = ['fulldatasetplus48']
 
 UNIVARIATE_ARCHIVE_NAMES = ['TSC']
 # UNIVARIATE_ARCHIVE_NAMES = ['TSC', 'InlineSkateXPs', 'SITS']

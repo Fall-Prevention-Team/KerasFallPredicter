@@ -61,7 +61,7 @@ class Classifier_INCEPTION:
 
         x = keras.layers.Concatenate(axis=2)(conv_list)
         x = keras.layers.BatchNormalization()(x)
-        #activation='relu'
+        #activation='relu' # op: leaky_relu
         x = keras.layers.Activation(activation='leaky_relu')(x)
         return x
 
@@ -72,7 +72,7 @@ class Classifier_INCEPTION:
 
 
         x = keras.layers.Add()([shortcut_y, out_tensor])
-        #activation='relu'
+        #activation='relu' op: leaky_relu
         x = keras.layers.Activation('leaky_relu')(x) 
         return x
 
@@ -99,13 +99,13 @@ class Classifier_INCEPTION:
         model.compile(loss='categorical_crossentropy', optimizer='adam',
                       metrics=['accuracy'])
 
-        # monitor='loss'
+        # monitor='loss' op:val_loss
         reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
                                                       min_lr=0.0001)
 
         file_path = self.output_directory + 'best_model.hdf5'
         
-        # monitor='loss'
+        # monitor='loss' op:val_loss
         model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
                                                            save_best_only=True)
 
