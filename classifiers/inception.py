@@ -13,7 +13,7 @@ class Classifier_INCEPTION:
     
     # depth = 6, nb_filters=32
     def __init__(self, output_directory, input_shape, nb_classes, verbose=False, build=True, batch_size=64, # kernel_size OG = 41, trial 49, 
-                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=49, nb_epochs=1500): # epochs should be 1500
+                 nb_filters=32, use_residual=True, use_bottleneck=True, depth=6, kernel_size=41, nb_epochs=1500): # epochs should be 1500
 
         self.output_directory = output_directory
 
@@ -43,7 +43,7 @@ class Classifier_INCEPTION:
 
         # kernel_size_s = [3, 5, 8, 11, 17]
         # range orginal = 3
-        kernel_size_s = [self.kernel_size // (2 ** i) for i in range(6)]
+        kernel_size_s = [self.kernel_size // (2 ** i) for i in range(3)]
 
         conv_list = []
         
@@ -62,7 +62,7 @@ class Classifier_INCEPTION:
         x = keras.layers.Concatenate(axis=2)(conv_list)
         x = keras.layers.BatchNormalization()(x)
         #activation='relu' # op: leaky_relu
-        x = keras.layers.Activation(activation='leaky_relu')(x)
+        x = keras.layers.Activation(activation='relu')(x)
         return x
 
     def _shortcut_layer(self, input_tensor, out_tensor):
@@ -73,7 +73,7 @@ class Classifier_INCEPTION:
 
         x = keras.layers.Add()([shortcut_y, out_tensor])
         #activation='relu' op: leaky_relu
-        x = keras.layers.Activation('leaky_relu')(x) 
+        x = keras.layers.Activation('relu')(x) 
         return x
 
     def build_model(self, input_shape, nb_classes):
@@ -99,14 +99,14 @@ class Classifier_INCEPTION:
         model.compile(loss='categorical_crossentropy', optimizer='adam',
                       metrics=['accuracy'])
 
-        # monitor='loss' op:val_loss
-        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=50,
+        # monitor='loss' #patience=50 op:val_loss 
+        reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='loss', factor=0.5, patience=100,
                                                       min_lr=0.0001)
 
         file_path = self.output_directory + 'best_model.hdf5'
         
         # monitor='loss' op:val_loss
-        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='val_loss',
+        model_checkpoint = keras.callbacks.ModelCheckpoint(filepath=file_path, monitor='loss',
                                                            save_best_only=True)
 
         self.callbacks = [reduce_lr, model_checkpoint]
